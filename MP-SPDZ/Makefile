@@ -121,7 +121,7 @@ setup: maybe-boost linux-machine-setup
 endif
 
 tldr: setup
-	make -j8 libff
+	make -j4 libff
 	$(MAKE) mascot-party.x
 	mkdir Player-Data 2> /dev/null; true
 
@@ -387,7 +387,7 @@ cmake:
 	wget https://github.com/Kitware/CMake/releases/download/v3.24.1/cmake-3.24.1.tar.gz
 	tar xzvf cmake-3.24.1.tar.gz
 	cd cmake-3.24.1; \
-	./bootstrap --parallel=8 --prefix=../local && make -j8 && make install
+	./bootstrap --parallel=8 --prefix=../local && make -j4 && make install
 
 #local/lib/libff.a: libff
 

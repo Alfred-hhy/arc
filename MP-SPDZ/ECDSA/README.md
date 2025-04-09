@@ -7,8 +7,8 @@ in `preprocessing.hpp` and `sign.hpp`, respectively.
 
 #### Compilation
 
-- Compile the binaries: `make -j8 ecdsa`
-- Or compile the static binaries: `make -j8 ecdsa-static`
+- Compile the binaries: `make -j4 ecdsa`
+- Or compile the static binaries: `make -j4 ecdsa-static`
 
 #### Running
 

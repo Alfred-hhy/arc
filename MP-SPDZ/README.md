@@ -72,7 +72,7 @@ Scripts/compile-run.py mascot tutorial
 ```
 
 On strong enough hardware setups (several cores and GB of RAM), you
-can speed up the last step by running `make -j8 mascot-party.x` beforehand.
+can speed up the last step by running `make -j4 mascot-party.x` beforehand.
 
 #### TL;DR (Docker)
 Build a docker image for `mascot-party.x`:
@@ -710,7 +710,7 @@ work similarly.
 
 First compile the virtual machine:
 
-`make -j8 mascot-party.x`
+`make -j4 mascot-party.x`
 
 and a high-level program, for example the tutorial (use `-R 64` for
 SPDZ2k and Semi2k and `-B <precision>` for SemiBin):
@@ -756,7 +756,7 @@ al.](https://eprint.iacr.org/2013/426) by adding `MY_CFLAGS +=
 
 Compile the virtual machine:
 
-`make -j 8 yao`
+`make -j 4 yao`
 
 and the high-level program:
 
@@ -864,7 +864,7 @@ In the following, we will walk through running the tutorial modulo
 
 First, compile the virtual machine:
 
-`make -j 8 replicated-ring-party.x`
+`make -j 4 replicated-ring-party.x`
 
 In order to compile a high-level program, use `./compile.py -R 64`:
 
@@ -936,7 +936,7 @@ First, compile the virtual machine. In order to run with more than
 three parties, change the definition of `MAX_N_PARTIES` in
 `BMR/config.h` accordingly.
 
-`make -j 8 real-bmr-party.x`
+`make -j 4 real-bmr-party.x`
 
 In order to compile a high-level program, use `./compile.py -B`:
 
@@ -986,7 +986,7 @@ with the SPDZ online phase.
 
 All programs required in this section can be compiled with the target `online`:
 
-`make -j 8 online`
+`make -j 4 online`
 
 #### To setup for benchmarking the online phase
 
@@ -1078,7 +1078,7 @@ number of parties albeit slower.
 
 Compile the virtual machine:
 
-`make -j 8 bmr`
+`make -j 4 bmr`
 
 After compiling the mpc file:
 

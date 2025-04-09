@@ -22,5 +22,5 @@
     - name: "Compile MP-SPDZ all"
       community.general.make:
         chdir: "{{ mpspdz_dir }}"
-        jobs: "36"
+        jobs: "4"
         target: "all"
