@@ -56,36 +56,36 @@ $SUITE_VARS$:
     stage: # "compile" in run and then in next run "run"
       $FACTOR$: [ compile, run ] # ensure that this is last factor
 
-#sh:
-#  n_repetitions: 1
-#  host_types:
-#    consistency:
-#      n: 3
-#      check_status: True
-#      init_roles:
-#        - setup-base
-#        - setup-consistency
-#        - download-dataset
-#      $CMD$:
-#        - main: "[% my_run.cmd_mpspdz | replace('<PLAYER-ID>', 0) %]"
-#        - main: "[% my_run.cmd_mpspdz | replace('<PLAYER-ID>', 1) %]"
-#        - main: "[% my_run.cmd_mpspdz | replace('<PLAYER-ID>', 2) %]"
-#
-#  base_experiment:
-#
-#    consistency_args:
-#      type:
-#        $FACTOR$: [ sha3s, cerebro, pc ]
-#
-#    mpc_type: sh
-#
-#  factor_levels:
-#
-#    - mpc:
-#        protocol_setup: "semi_honest_3"
-#        domain: ring_split
-#        compiler_args: [ '-R', '64', '-C', '--budget', "[% my_run._runtime_info.budget %]", '-Z', '3', '-D' ]
-#        custom_prime: null
+sh:
+  n_repetitions: 1
+  host_types:
+    consistency:
+      n: 3
+      check_status: True
+      init_roles:
+        - setup-base
+        - setup-consistency
+        - download-dataset
+      $CMD$:
+        - main: "[% my_run.cmd_mpspdz | replace('<PLAYER-ID>', 0) %]"
+        - main: "[% my_run.cmd_mpspdz | replace('<PLAYER-ID>', 1) %]"
+        - main: "[% my_run.cmd_mpspdz | replace('<PLAYER-ID>', 2) %]"
+
+  base_experiment:
+
+    consistency_args:
+      type:
+        $FACTOR$: [ sha3s, cerebro, pc ]
+
+    mpc_type: sh
+
+  factor_levels:
+
+    - mpc:
+        protocol_setup: "semi_honest_3"
+        domain: ring_split
+        compiler_args: [ '-R', '64', '-C', '--budget', "[% my_run._runtime_info.budget %]", '-Z', '3', '-D' ]
+        custom_prime: null
 #
 #    - mpc:
 #        protocol_setup: "rep-field-party"
@@ -99,37 +99,37 @@ $SUITE_VARS$:
 #        compiler_args: [ '-C', '--budget', '10000', '-Y', '-F 251', '-D' ]
 #        custom_prime: '8444461749428370424248824938781546531375899335154063827935233455917409239041'
 
-mal:
-  n_repetitions: 1
-  host_types:
-    consistency:
-      n: 3
-      check_status: True
-      init_roles:
-        - setup-base
-        - setup-consistency
-#        - setup-spdz-secrets
-      $CMD$:
-        - main: "[% my_run.cmd_mpspdz | replace('<PLAYER-ID>', 0) %]"
-        - main: "[% my_run.cmd_mpspdz | replace('<PLAYER-ID>', 1) %]"
-        - main: "[% my_run.cmd_mpspdz | replace('<PLAYER-ID>', 2) %]"
-
-  base_experiment:
-    convert_chunk_size: 100000
-
-    consistency_args:
-      type:
-        $FACTOR$: [ sha3s, cerebro, pc ]
-
-    mpc_type: mal
-
-  factor_levels:
-
-    - mpc:
-        protocol_setup: "sy-rep-ring-party"
-        domain: ring_split
-        compiler_args: [ '-R', '64', '-C', '--budget', "[% my_run._runtime_info.budget %]", '-Z', '3', '-D' ]
-        custom_prime: null
+#mal:
+#  n_repetitions: 1
+#  host_types:
+#    consistency:
+#      n: 3
+#      check_status: True
+#      init_roles:
+#        - setup-base
+#        - setup-consistency
+##        - setup-spdz-secrets
+#      $CMD$:
+#        - main: "[% my_run.cmd_mpspdz | replace('<PLAYER-ID>', 0) %]"
+#        - main: "[% my_run.cmd_mpspdz | replace('<PLAYER-ID>', 1) %]"
+#        - main: "[% my_run.cmd_mpspdz | replace('<PLAYER-ID>', 2) %]"
+#
+#  base_experiment:
+#    convert_chunk_size: 100000
+#
+#    consistency_args:
+#      type:
+#        $FACTOR$: [ sha3s, cerebro, pc ]
+#
+#    mpc_type: mal
+#
+#  factor_levels:
+#
+#    - mpc:
+#        protocol_setup: "sy-rep-ring-party"
+#        domain: ring_split
+#        compiler_args: [ '-R', '64', '-C', '--budget', "[% my_run._runtime_info.budget %]", '-Z', '3', '-D' ]
+#        custom_prime: null
 
 #    - mpc:
 #        protocol_setup: "sy-rep-field-party"
