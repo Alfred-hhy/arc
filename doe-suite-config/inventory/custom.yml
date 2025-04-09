@@ -1,0 +1,17 @@
+---
+all:
+  children:
+    consistency:
+      hosts:
+        n1:
+          ansible_host: 165.22.110.122
+          ansible_user: ubuntu
+          private_dns_name: 10.104.0.3
+        n2:
+          ansible_host: 165.22.96.238
+          ansible_user: ubuntu
+          private_dns_name: 10.104.0.4
+        n3:
+          ansible_host: 157.245.50.83  # 假设截图中的IP是15.7.245.83（去掉了多余的.50）
+          ansible_user: ubuntu
+          private_dns_name: 10.104.0.2
