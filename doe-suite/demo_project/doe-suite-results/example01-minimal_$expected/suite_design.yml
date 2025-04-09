@@ -1,0 +1,36 @@
+minimal:
+  n_repetitions: 1
+  common_roles: []
+  host_types:
+    small:
+      n: 1
+      check_status: true
+      init_roles: []
+      $CMD$:
+      - main: echo "[% my_run.arg1 %] [% my_run.arg2 %][% my_run.arg3 %] "
+  base_experiment:
+    arg1: hello
+    arg2:
+      $FACTOR$:
+      - world
+      - universe
+    arg3:
+      $FACTOR$:
+      - .
+      - '!'
+  factor_levels:
+  - {}
+  except_filters: []
+$ETL$:
+  check_error:
+    experiments:
+    - minimal
+    extractors:
+      ErrorExtractor:
+        file_regex:
+        - ^stderr.log$
+      IgnoreExtractor:
+        file_regex:
+        - ^stdout.log$
+    transformers: []
+    loaders: {}

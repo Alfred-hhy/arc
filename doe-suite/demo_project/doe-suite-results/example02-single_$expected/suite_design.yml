@@ -1,0 +1,104 @@
+experiment_1:
+  n_repetitions: 2
+  common_roles: []
+  host_types:
+    small:
+      n: 1
+      check_status: true
+      init_roles:
+      - setup-small
+      $CMD$:
+      - main: '[% my_run.python_run %]/demo_project/demo_latency.py --opt [% my_run.opt %] --size [% my_run.payload_size_mb %] --out [% my_run.out %]'
+  base_experiment:
+    python_run: "[% 'demo_project_python' | at_runtime(exp_host_lst) %] [% 'exp_code_dir' | at_runtime(exp_host_lst) %]"
+    out: json
+    payload_size_mb:
+      $FACTOR$:
+      - 10
+      - 20
+      - 30
+    opt:
+      $FACTOR$:
+      - true
+      - false
+  factor_levels:
+  - {}
+  except_filters: []
+experiment_2:
+  n_repetitions: 3
+  common_roles: []
+  host_types:
+    small:
+      n: 1
+      check_status: true
+      init_roles:
+      - setup-small
+      $CMD$:
+      - main: '[% my_run.python_run %]/demo_project/demo.py --config config.json'
+  base_experiment:
+    python_run: "[% 'demo_project_python' | at_runtime(exp_host_lst) %] [% 'exp_code_dir' | at_runtime(exp_host_lst) %]"
+    out: csv
+    problem:
+      opt: false
+      size:
+        $FACTOR$:
+        - 10
+        - 15
+        - 20
+      other: '[0, 1]'
+  factor_levels:
+  - {}
+  except_filters: []
+$ETL$:
+  pipeline1:
+    experiments:
+    - experiment_1
+    extractors:
+      JsonExtractor:
+        file_regex:
+        - .*\.json$
+      ErrorExtractor:
+        file_regex:
+        - ^stderr.log$
+      IgnoreExtractor:
+        file_regex:
+        - ^stdout.log$
+    transformers:
+    - name: RepAggTransformer
+      ignore_columns: []
+      data_columns:
+      - latency
+      agg_functions:
+      - mean
+      - min
+      - max
+      - std
+      - count
+    loaders:
+      CsvSummaryLoader:
+        skip_empty: true
+      DemoLatencyPlotLoader: {}
+  pipeline2:
+    experiments:
+    - experiment_2
+    extractors:
+      CsvExtractor:
+        file_regex:
+        - .*\.csv$
+        delimiter: ','
+        has_header: true
+      ErrorExtractor:
+        file_regex:
+        - ^stderr.log$
+      IgnoreExtractor:
+        file_regex:
+        - ^stdout.log$
+    transformers:
+    - df.sort_values:
+        by:
+        - run
+        - rep
+        ignore_index: yes
+    loaders:
+      CsvSummaryLoader:
+        skip_empty: true

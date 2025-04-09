@@ -1,0 +1,102 @@
+exp_single:
+  n_repetitions: 2
+  common_roles:
+  - setup-common
+  host_types:
+    small:
+      n: 1
+      check_status: true
+      init_roles:
+      - setup-small
+      $CMD$:
+      - main: echo "[% my_run.info %];[% my_run.seed %];[% my_run.opt%]" >> results/out.csv
+  base_experiment:
+    info: $FACTOR$
+    seed: 1234
+    opt: $FACTOR$
+  factor_levels:
+  - info: run1 - with optimization
+    opt: true
+  - info: run2 - without optimization
+    opt: false
+  except_filters: []
+exp_multi_1:
+  n_repetitions: 3
+  common_roles:
+  - setup-common
+  host_types:
+    client:
+      n: 3
+      check_status: true
+      init_roles: []
+      $CMD$:
+      - main: sleep 5 && echo '[% my_run.host_vars.client.msg %] from client 1' | netcat -q 1 [% my_run.server_dns %] [% my_run.port %]
+      - main: sleep 5 && echo '[% my_run.host_vars.client.msg %] from client 2' | netcat -q 1 [% my_run.server_dns %] [% my_run.port %]
+        aux1: echo 'aux1 start' && sleep 3 && echo 'aux1 end'
+        aux2: echo 'aux2 start' && sleep 50 && cat nonexistent.txt
+      - main: sleep 5 && echo '[% my_run.host_vars.client.msg %] from client 3' | netcat -q 1 [% my_run.server_dns %] [% my_run.port %]
+    server:
+      n: 1
+      check_status: false
+      init_roles:
+      - setup-server
+      $CMD$:
+      - main: ncat -l [% my_run.port %] --keep-open
+        bg1: echo 'bg1 start' && sleep 3 && echo 'bg1 end'
+        bg2: echo 'bg2 start' && sleep 600 && cat nonexistent.txt
+  base_experiment:
+    server_dns: "[% exp_host_lst | to_private_dns_name('server') | default('<UNDEFINED-DNS>') %]"
+    port: 2807
+    host_vars:
+      client:
+        msg:
+          $FACTOR$:
+          - hello server
+          - hi server
+          - good day server
+  factor_levels:
+  - {}
+  except_filters: []
+exp_multi_2:
+  n_repetitions: 2
+  common_roles:
+  - setup-common
+  host_types:
+    small:
+      n: 2
+      check_status: true
+      init_roles: []
+      $CMD$:
+      - main: 'echo "[% my_run.prefix %] [% my_run.n_parties %] [% my_run.postfix %]" '
+      - main: 'echo "[% my_run.prefix %] [% my_run.n_parties %] [% my_run.postfix %]" '
+  base_experiment:
+    n_parties:
+      $FACTOR$:
+      - 100
+      - 200
+      - 300
+      - 500
+    prefix: $FACTOR$
+    postfix: $FACTOR$
+  factor_levels:
+  - prefix: hi
+    postfix: parties
+  - prefix: hello
+    postfix: people
+  except_filters: []
+$ETL$:
+  check_error:
+    experiments:
+    - exp_single
+    - exp_multi_1
+    - exp_multi_2
+    extractors:
+      ErrorExtractor:
+        file_regex:
+        - ^stderr.log$
+      IgnoreExtractor:
+        file_regex:
+        - stdout.log
+        - out.csv
+    transformers: []
+    loaders: {}
