@@ -40,8 +40,8 @@ $SUITE_VARS$:
       n_samples: 1
       n_input_parties: "[% my_run.n_parties %]"
 
-      dataset:
-        $FACTOR$: [ adult_3p, mnist_full_3party, cifar_alexnet_3party ]
+      dataset: adult_3p
+#        $FACTOR$: [ adult_3p, mnist_full_3party, cifar_alexnet_3party ]
 
       debug: False  # for a final benchmarking run, can also use `debug: False`, this should then only release no secret info
       emulate: False

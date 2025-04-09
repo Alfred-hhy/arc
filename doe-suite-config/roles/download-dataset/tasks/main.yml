@@ -4,48 +4,54 @@
     state: directory
     mode: '0755'
 
-- name: Remove all files in dataset dir
-  ansible.builtin.file:
-    path: "{{ dataset_dir }}"
-    state: absent
-
-- name: Create dataset directory again after removal
-  ansible.builtin.file:
-    path: "{{ dataset_dir }}"
-    state: directory
-    mode: '0755'
-
-- name: Download datasets
-  ansible.builtin.get_url:
-    url: "{{ item.url }}"
-    dest: "{{ dataset_dir }}/{{ item.name }}.zip"
-    timeout: 300
-    validate_certs: no
+- name: Check if dataset ZIP files already exist
+  ansible.builtin.stat:
+    path: "{{ dataset_dir }}/{{ item.name }}.zip"
   loop:
     - { name: "adult_3p", url: "http://arc-mpspdz-data.s3.amazonaws.com/adult_3p.zip" }
     - { name: "mnist_full_3party", url: "http://arc-mpspdz-data.s3.amazonaws.com/mnist_full_3party.zip" }
     - { name: "cifar_alexnet_3party", url: "http://arc-mpspdz-data.s3.amazonaws.com/cifar_alexnet_3party.zip" }
+  register: zip_files_stat
 
-- name: Find All Zip Files in Dataset Dir
+- name: Download datasets only if not already present
+  ansible.builtin.get_url:
+    url: "{{ item.item.url }}"
+    dest: "{{ dataset_dir }}/{{ item.item.name }}.zip"
+    timeout: 300
+    validate_certs: no
+  loop: "{{ zip_files_stat.results }}"
+  when: not item.stat.exists
+
+- name: Find all ZIP files in dataset dir
   ansible.builtin.find:
     paths: "{{ dataset_dir }}"
     patterns: "*.zip"
   register: my_zip_files
 
+- name: Check if dataset directories already exist
+  ansible.builtin.stat:
+    path: "{{ exp_code_dir }}/MP-SPDZ/Player-Data/{{ file.path | basename | split('.') | first }}"
+  loop: "{{ my_zip_files.files }}"
+  loop_control:
+    loop_var: file
+  register: dataset_dirs_stat
+
 - name: Create a directory if it does not exist (for each dataset)
   ansible.builtin.file:
-    path: "{{ exp_code_dir }}/MP-SPDZ/Player-Data/{{ file.path | basename | split('.') | first }}"
+    path: "{{ exp_code_dir }}/MP-SPDZ/Player-Data/{{ item.item.file.path | basename | split('.') | first }}"
     state: directory
     mode: '0755'
-  loop: "{{ my_zip_files.files }}"
+  loop: "{{ dataset_dirs_stat.results }}"
+  when: not item.stat.exists
   loop_control:
-    loop_var: file
+    loop_var: item
 
-- name: Unarchive a file that is already on the remote machine
+- name: Unarchive a file if not already extracted
   ansible.builtin.unarchive:
-    src: "{{ file.path }}"
-    dest: "{{ exp_code_dir }}/MP-SPDZ/Player-Data/{{ file.path | basename | split('.') | first }}"
+    src: "{{ item.item.file.path }}"
+    dest: "{{ exp_code_dir }}/MP-SPDZ/Player-Data/{{ item.item.file.path | basename | split('.') | first }}"
     remote_src: yes
-  loop: "{{ my_zip_files.files }}"
+  loop: "{{ dataset_dirs_stat.results }}"
+  when: not item.stat.exists
   loop_control:
-    loop_var: file
+    loop_var: item
