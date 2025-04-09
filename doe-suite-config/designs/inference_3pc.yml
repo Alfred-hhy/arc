@@ -43,8 +43,8 @@ $SUITE_VARS$:
 
       debug: False  # for a final benchmarking run, can also use `debug: False`, this should then only release no secret info
       emulate: False
-      dataset:
-        $FACTOR$: [ adult_3p, mnist_full_3party, cifar_alexnet_3party ]
+      dataset: adult_3p
+#        $FACTOR$: [ adult_3p, mnist_full_3party, cifar_alexnet_3party ]
 
       # in a network with latency, a high batch size for ml.py is key to a good performance (60k raised insufficient memory error)
       batch_size: 128 #1024 #256 # was 128 before   # 60000 -> insufficient memory
