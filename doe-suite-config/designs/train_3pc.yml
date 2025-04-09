@@ -43,7 +43,7 @@ $SUITE_VARS$:
       debug: False  # for a final benchmarking run, can also use `debug: False`, this should then only release no secret info
       emulate: False
 #      dataset: mnist_full_3party
-      dataset: adult_3p
+      dataset: mnist_full_3party
 #        $FACTOR$: [ adult_3p, mnist_full_3party, cifar_alexnet_3party ]
       #          $FACTOR$: [ adult_3p ]
 #      cifar_alexnet_3party
