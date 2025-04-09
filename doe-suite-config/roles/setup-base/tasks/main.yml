@@ -124,9 +124,9 @@
   ansible.builtin.stat:
     path: "{{ mpspdz_dir }}/semi2k-party.x"
   register: mpspdz_compiled
-- name: "Compile MP-SPDZ (if some files dont exist)"
-#  when: mpspdz_compiled.stat.exists == False
-  block:
+#- name: "Compile MP-SPDZ (if some files dont exist)"
+##  when: mpspdz_compiled.stat.exists == False
+#  block:
 #    - name: "Make cmake 3.15" # TODO: Is this necessary?
 #      community.general.make:
 #        chdir: "{{ mpspdz_dir }}"
