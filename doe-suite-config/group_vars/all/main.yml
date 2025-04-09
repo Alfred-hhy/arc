@@ -5,8 +5,8 @@
 #git_remote_repository: "git@github.com:pps-lab/cryptographic-auditing-mpc.git"
 # Can also get multiple repos and with a specific branch / commit
 git_remote_repository:
-- repo: "https://github.com/pps-lab/arc.git"
-  version: https
+- repo: "https://github.com/Alfred-hhy/arc.git"
+  version: main
 
 prj_id_prefix: "cryptographic-auditing-mpc"
 
