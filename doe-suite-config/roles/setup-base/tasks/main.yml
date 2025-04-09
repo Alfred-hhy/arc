@@ -127,23 +127,23 @@
 - name: "Compile MP-SPDZ (if some files dont exist)"
 #  when: mpspdz_compiled.stat.exists == False
   block:
-    - name: "Make cmake 3.15" # TODO: Is this necessary?
-      community.general.make:
-        chdir: "{{ mpspdz_dir }}"
-        jobs: "4"
-        target: "cmake"
-
-    - name: Manually download boost (old link is broken from libOTe)
-      ansible.builtin.get_url:
-        url: https://archives.boost.io/release/1.83.0/source/boost_1_83_0.tar.bz2
-        dest: "{{ mpspdz_dir }}/deps/libOTe/cryptoTools/thirdparty/boost_1_83_0.tar.bz2"
-#        force: true
-
-    - name: "Make boost 1.81"
-      community.general.make:
-        chdir: "{{ mpspdz_dir }}"
-        jobs: "4"
-        target: "boost"
+#    - name: "Make cmake 3.15" # TODO: Is this necessary?
+#      community.general.make:
+#        chdir: "{{ mpspdz_dir }}"
+#        jobs: "4"
+#        target: "cmake"
+#
+#    - name: Manually download boost (old link is broken from libOTe)
+#      ansible.builtin.get_url:
+#        url: https://archives.boost.io/release/1.83.0/source/boost_1_83_0.tar.bz2
+#        dest: "{{ mpspdz_dir }}/deps/libOTe/cryptoTools/thirdparty/boost_1_83_0.tar.bz2"
+##        force: true
+#
+#    - name: "Make boost 1.81"
+#      community.general.make:
+#        chdir: "{{ mpspdz_dir }}"
+#        jobs: "4"
+#        target: "boost"
 #    # SOMEHOW THIS LIBOTE IS FAILING??
 #    - name: "Compile libote"
 #      community.general.make:

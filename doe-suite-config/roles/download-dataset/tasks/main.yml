@@ -1,21 +1,36 @@
-
+- name: Ensure dataset directory exists
+  ansible.builtin.file:
+    path: "{{ dataset_dir }}"
+    state: directory
+    mode: '0755'
 
 - name: Remove all files in dataset dir
   ansible.builtin.file:
-      path: "{{ dataset_dir }}"
-      state: absent
+    path: "{{ dataset_dir }}"
+    state: absent
 
-- name: Download S3 Dataset
-  ansible.builtin.shell:
-    cmd: "aws s3 sync s3://{{ input_bucket_name }} {{ dataset_dir }}"
+- name: Create dataset directory again after removal
+  ansible.builtin.file:
+    path: "{{ dataset_dir }}"
+    state: directory
+    mode: '0755'
 
+- name: Download datasets
+  ansible.builtin.get_url:
+    url: "{{ item.url }}"
+    dest: "{{ dataset_dir }}/{{ item.name }}.zip"
+    timeout: 300
+    validate_certs: no
+  loop:
+    - { name: "adult_3p", url: "http://arc-mpspdz-data.s3.amazonaws.com/adult_3p.zip" }
+    - { name: "mnist_full_3party", url: "http://arc-mpspdz-data.s3.amazonaws.com/mnist_full_3party.zip" }
+    - { name: "cifar_alexnet_3party", url: "http://arc-mpspdz-data.s3.amazonaws.com/cifar_alexnet_3party.zip" }
 
 - name: Find All Zip Files in Dataset Dir
   ansible.builtin.find:
     paths: "{{ dataset_dir }}"
     patterns: "*.zip"
   register: my_zip_files
-
 
 - name: Create a directory if it does not exist (for each dataset)
   ansible.builtin.file:
@@ -30,7 +45,6 @@
   ansible.builtin.unarchive:
     src: "{{ file.path }}"
     dest: "{{ exp_code_dir }}/MP-SPDZ/Player-Data/{{ file.path | basename | split('.') | first }}"
-#    creates: "{{ exp_code_dir }}/MP-SPDZ/Player-Data/{{ file.path | basename | split('.') | first }}"
     remote_src: yes
   loop: "{{ my_zip_files.files }}"
   loop_control:
