@@ -150,23 +150,23 @@
 #        chdir: "{{ mpspdz_dir }}"
 #        jobs: "4"
 #        target: "libote"
-    - name: "Compile MP-SPDZ tldr to get all libraries"
-      community.general.make:
-        chdir: "{{ mpspdz_dir }}"
-        jobs: "4"
-        target: "tldr"
-    - name: "Install libff"
-      community.general.make:
-        chdir: "{{ mpspdz_dir }}"
-        jobs: "4"
-        target: "libff"
-    #  when: have_compiled_res.stat.exists == False
-
-    - name: "Compile MP-SPDZ all"
-      community.general.make:
-        chdir: "{{ mpspdz_dir }}"
-        jobs: "4"
-        target: "all"
+#    - name: "Compile MP-SPDZ tldr to get all libraries"
+#      community.general.make:
+#        chdir: "{{ mpspdz_dir }}"
+#        jobs: "4"
+#        target: "tldr"
+#    - name: "Install libff"
+#      community.general.make:
+#        chdir: "{{ mpspdz_dir }}"
+#        jobs: "4"
+#        target: "libff"
+#    #  when: have_compiled_res.stat.exists == False
+#
+#    - name: "Compile MP-SPDZ all"
+#      community.general.make:
+#        chdir: "{{ mpspdz_dir }}"
+#        jobs: "4"
+#        target: "all"
     #  when: have_compiled_res.stat.exists == False
 
 #- name: "Create Player-Data Folder"
