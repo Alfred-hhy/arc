@@ -4,14 +4,14 @@ all:
     consistency:
       hosts:
         n1:
-          ansible_host: 165.22.110.122
+          ansible_host: 64.227.146.235  # 更新为截图中的公有 IP
           ansible_user: ubuntu
-          private_dns_name: 10.104.0.3
+          private_dns_name: 10.122.0.2  # 更新为截图中的私有 IP
         n2:
-          ansible_host: 165.22.96.238
+          ansible_host: 167.71.230.123  # 更新为截图中的公有 IP
           ansible_user: ubuntu
-          private_dns_name: 10.104.0.4
+          private_dns_name: 10.122.0.4  # 更新为截图中的私有 IP
         n3:
-          ansible_host: 157.245.50.83  # 假设截图中的IP是15.7.245.83（去掉了多余的.50）
+          ansible_host: 64.227.150.207  # 更新为截图中的公有 IP
           ansible_user: ubuntu
-          private_dns_name: 10.104.0.2
+          private_dns_name: 10.122.0.3  # 更新为截图中的私有 IP
