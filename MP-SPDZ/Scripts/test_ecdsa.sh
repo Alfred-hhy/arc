@@ -4,7 +4,7 @@ echo SECURE = -DINSECURE >> CONFIG.mine
 touch -r CONFIG CONFIG.mine
 touch ECDSA/Fake-ECDSA.cpp
 
-make -j4 ecdsa Fake-ECDSA.x
+make -j8 ecdsa Fake-ECDSA.x
 
 port=${PORT:-$((RANDOM%10000+10000))}
 

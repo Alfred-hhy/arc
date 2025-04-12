@@ -10,7 +10,7 @@ $SUITE_VARS$:
 
   commit_output: False
   convert_ring_bits: 31
-  convert_n_threads: 4
+  convert_n_threads: 20
   convert_chunk_size: 150000
 
   sleep_time: 60
@@ -56,7 +56,7 @@ $SUITE_VARS$:
       # in a network with latency, a high batch size for ml.py is key to a good performance (60k raised insufficient memory error)
       batch_size: 2 #1024 #256 # was 128 before   # 60000 -> insufficient memory
       n_batches: 1
-#      n_threads: 4 #128 #64 # TODO before was 32 -> see if this helps (128 raises too many files runtime error)
+#      n_threads: 20 #128 #64 # TODO before was 32 -> see if this helps (128 raises too many files runtime error)
 
 #      audit_trigger_idx: 0 # select single audit trigger (from all)
 

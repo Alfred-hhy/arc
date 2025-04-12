@@ -25,7 +25,7 @@ clean:
 	cd MP-SPDZ && $(MAKE) clean
 
 setup-mpspdz:
-	cd MP-SPDZ && $(MAKE) -j 4 tldr
+	cd MP-SPDZ && $(MAKE) -j 8 tldr
 	cd MP-SPDZ && make emulate.x
 
 # only if simlink does not exist, create it
@@ -35,8 +35,8 @@ simlink:
 
 install:
 	poetry install && \
-	(cd MP-SPDZ && $(MAKE) -j4 libff) && \
-	(cd MP-SPDZ && make -j4 emulate.x && make -j4 replicated-ring-party.x) && \
+	(cd MP-SPDZ && $(MAKE) -j8 libff) && \
+	(cd MP-SPDZ && make -j8 emulate.x && make -j8 replicated-ring-party.x) && \
 	(cd MP-SPDZ && Scripts/setup-ssl.sh) && \
 	(cd MP-SPDZ && Scripts/setup-ssl.sh 10 Player-SSL-Data)
 

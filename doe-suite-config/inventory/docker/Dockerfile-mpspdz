@@ -26,8 +26,8 @@ RUN --mount=type=ssh,mode=0666 git clone --recurse-submodules git@github.com:Alf
 RUN sed -i 's/-DSSL_DIR="Player-Data\/"/-DSSL_DIR="Player-SSL-Data\/"/' /home/ubuntu/code/MP-SPDZ/CONFIG
 RUN sed -i 's/-DPREP_DIR="Player-Prep-Data\/"/-DPREP_DIR="Player-Data\/"/' /home/ubuntu/code/MP-SPDZ/CONFIG
 
-RUN cd /home/ubuntu/code/MP-SPDZ && make -j4 libff
-RUN cd /home/ubuntu/code/MP-SPDZ && make -j4 replicated-ring-party.x rep-ring-switch-party.x semi2k-party.x
+RUN cd /home/ubuntu/code/MP-SPDZ && make -j8 libff
+RUN cd /home/ubuntu/code/MP-SPDZ && make -j8 replicated-ring-party.x rep-ring-switch-party.x semi2k-party.x
 
 # Cargo
 RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
