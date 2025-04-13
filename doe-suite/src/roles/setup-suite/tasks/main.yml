@@ -88,6 +88,12 @@
 #   ssh-add ~/.ssh/private_key_rsa
 #
 # 3. (On a MAC, need add to keychain)
+- name: Start SSH agent and add key
+  shell: |
+    eval "$(ssh-agent -s)"
+    ssh-add /home/{{ ansible_user }}/.ssh/id_ec_arc
+  args:
+    executable: /bin/bash
 
 - name: Update Code from Git remote repository (or multiple)  [if this fails, did you setup ssh-agent (see docs)?]
   git:
