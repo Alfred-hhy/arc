@@ -24,7 +24,7 @@ RUN mkdir -p /home/ubuntu/.ssh && \
 
 # 添加 SSH 私钥
 # 添加 SSH 私钥
-RUN echo -e "-----BEGIN OPENSSH PRIVATE KEY-----\nb3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW\nQyNTUxOQAAACAxHOdYhLPVPtgiQ9IH6InaYJOTe02QYsxh6Xm3IBJntwAAAIjO80/dzvNP3Q\nAAAAtzc2gtZWQyNTUxOQAAACAxHOdYhLPVPtgiQ9IH6InaYJOTe02QYsxh6Xm3IBJntwAAAE\nAwUQIBATAFBgMrZXAEIgQgHcshVwJn6+ej+ozT014f2zEc51iEs9U+2CJD0gfoidpgk5N7TZ\nBizGHpebcgEme3AAAAAAECAwQF\n-----END OPENSSH PRIVATE KEY-----" > /home/ubuntu/.ssh/id_ec_arc && \
+RUN echo "-----BEGIN OPENSSH PRIVATE KEY-----\nb3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW\nQyNTUxOQAAACAxHOdYhLPVPtgiQ9IH6InaYJOTe02QYsxh6Xm3IBJntwAAAIjO80/dzvNP3Q\nAAAAtzc2gtZWQyNTUxOQAAACAxHOdYhLPVPtgiQ9IH6InaYJOTe02QYsxh6Xm3IBJntwAAAE\nAwUQIBATAFBgMrZXAEIgQgHcshVwJn6+ej+ozT014f2zEc51iEs9U+2CJD0gfoidpgk5N7TZ\nBizGHpebcgEme3AAAAAAECAwQF\n-----END OPENSSH PRIVATE KEY-----" > /home/ubuntu/.ssh/id_ec_arc && \
     chown ubuntu:ubuntu /home/ubuntu/.ssh/id_ec_arc && \
     chmod 600 /home/ubuntu/.ssh/id_ec_arc
 
