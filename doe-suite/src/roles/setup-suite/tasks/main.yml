@@ -94,7 +94,15 @@
 #    ssh-add /home/{{ ansible_user }}/.ssh/id_ec_arc
 #  args:
 #    executable: /bin/bash
+- name: Debug environment variables
+  ansible.builtin.shell: env
+  register: env_output
+  tags: [debug]
 
+- name: Print environment variables
+  debug:
+    msg: "{{ env_output.stdout_lines }}"
+  tags: [debug]
 - name: Update Code from Git remote repository (or multiple)  [if this fails, did you setup ssh-agent (see docs)?]
   git:
     repo: "{{ git_repo.repo }}"
