@@ -1,40 +1,21 @@
+
 FROM ubuntu:22.04
 
-# 安装必要软件
-RUN apt-get update && apt-get install -y openssh-server sudo rsync python3 && \
-    rm -rf /var/lib/apt/lists/*
+RUN apt update && apt install -y openssh-server sudo rsync python3
+RUN sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 
-# 配置 SSH 并创建运行时目录
-RUN sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
-    mkdir -p /run/sshd && \
-    chmod 755 /run/sshd
-
-# 创建用户并配置权限
-RUN useradd -m -s /bin/bash ubuntu && \
-    echo "ubuntu:test" | chpasswd && \
-    adduser ubuntu sudo && \
-    echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
-
-# 配置 SSH 公钥
+RUN useradd -m -s /bin/bash ubuntu
+RUN echo "ubuntu:test" | chpasswd && adduser ubuntu sudo
+RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> \
+/etc/sudoers
 COPY docker_public_key.pub /home/ubuntu/.ssh/authorized_keys
-RUN mkdir -p /home/ubuntu/.ssh && \
-    chown ubuntu:ubuntu /home/ubuntu/.ssh /home/ubuntu/.ssh/authorized_keys && \
-    chmod 700 /home/ubuntu/.ssh && \
-    chmod 600 /home/ubuntu/.ssh/authorized_keys
 
-# 添加 SSH 私钥
-## 添加 SSH 私钥
-#RUN echo "-----BEGIN OPENSSH PRIVATE KEY-----\nb3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW\nQyNTUxOQAAACAxHOdYhLPVPtgiQ9IH6InaYJOTe02QYsxh6Xm3IBJntwAAAIjO80/dzvNP3Q\nAAAAtzc2gtZWQyNTUxOQAAACAxHOdYhLPVPtgiQ9IH6InaYJOTe02QYsxh6Xm3IBJntwAAAE\nAwUQIBATAFBgMrZXAEIgQgHcshVwJn6+ej+ozT014f2zEc51iEs9U+2CJD0gfoidpgk5N7TZ\nBizGHpebcgEme3AAAAAAECAwQF\n-----END OPENSSH PRIVATE KEY-----" > /home/ubuntu/.ssh/id_ec_arc && \
-#    chown ubuntu:ubuntu /home/ubuntu/.ssh/id_ec_arc && \
-#    chmod 600 /home/ubuntu/.ssh/id_ec_arc
-
-# 添加 GitHub 到 known_hosts
-RUN ssh-keyscan github.com >> /home/ubuntu/.ssh/known_hosts && \
-    chown ubuntu:ubuntu /home/ubuntu/.ssh/known_hosts && \
-    chmod 644 /home/ubuntu/.ssh/known_hosts
-
-# 暴露 SSH 端口
+# 设置代理环境变量
+ENV http_proxy=http://host.docker.internal:7890
+ENV https_proxy=http://host.docker.internal:7890
+ENV all_proxy=http://host.docker.internal:7890
+ENV no_proxy=localhost,127.0.0.1
 EXPOSE 22
 
-# 启动 SSH 服务
+RUN mkdir /var/run/sshd
 CMD ["/usr/sbin/sshd", "-D"]
