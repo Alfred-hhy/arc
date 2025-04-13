@@ -1,35 +1,35 @@
 FROM ubuntu:22.04
 
-# 安装基础工具（Git、SSH、代理测试工具）
-RUN apt update && apt install -y openssh-server sudo rsync python3 git curl
+# 设置构建时的代理环境变量，使用主机的 Clash 代理
+ARG http_proxy=http://host.docker.internal:7890
+ARG https_proxy=http://host.docker.internal:7890
+ARG no_proxy=localhost,127.0.0.1
 
-# 允许 root SSH 登录（按需启用）
+# 配置 apt 使用代理
+RUN echo "Acquire::http::Proxy \"${http_proxy}\";" > /etc/apt/apt.conf.d/proxy.conf && \
+    echo "Acquire::https::Proxy \"${https_proxy}\";" >> /etc/apt/apt.conf.d/proxy.conf
+
+# 更新包列表并安装必要软件
+RUN apt-get update && apt-get install -y openssh-server sudo rsync python3 && \
+    rm -rf /var/lib/apt/lists/*
+
+# 配置 SSH
 RUN sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 
-# 创建 ubuntu 用户并配置 sudo
+# 创建用户并配置权限
 RUN useradd -m -s /bin/bash ubuntu && \
     echo "ubuntu:test" | chpasswd && \
     adduser ubuntu sudo && \
     echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
-# 配置 SSH 密钥（从宿主机复制公钥）
+# 配置 SSH 公钥
 COPY docker_public_key.pub /home/ubuntu/.ssh/authorized_keys
-RUN mkdir -p /home/ubuntu/.ssh && \
-    chown -R ubuntu:ubuntu /home/ubuntu/.ssh && \
+RUN chown ubuntu:ubuntu /home/ubuntu/.ssh/authorized_keys && \
     chmod 600 /home/ubuntu/.ssh/authorized_keys
-
-# 添加 GitHub 到 known_hosts（避免首次连接确认）
-RUN ssh-keyscan github.com >> /home/ubuntu/.ssh/known_hosts && \
-    chown ubuntu:ubuntu /home/ubuntu/.ssh/known_hosts
-
-# 设置 Git 全局代理（假设宿主机代理是 127.0.0.1:7890）
-# 注意：容器内需用 host.docker.internal 访问宿主机代理
-RUN git config --global http.proxy "http://host.docker.internal:7890" && \
-    git config --global https.proxy "http://host.docker.internal:7890"
 
 # 暴露 SSH 端口
 EXPOSE 22
 
-# 启动 SSH 服务
+# 创建 SSH 运行目录并启动服务
 RUN mkdir /var/run/sshd
 CMD ["/usr/sbin/sshd", "-D"]
