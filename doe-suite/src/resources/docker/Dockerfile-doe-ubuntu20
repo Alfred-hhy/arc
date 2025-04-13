@@ -1,16 +1,35 @@
+FROM ubuntu:22.04
 
-FROM ubuntu:20.04
+# 安装基础工具（Git、SSH、代理测试工具）
+RUN apt update && apt install -y openssh-server sudo rsync python3 git curl
 
-RUN apt update && apt install -y openssh-server sudo rsync python3
+# 允许 root SSH 登录（按需启用）
 RUN sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 
-RUN useradd -m -s /bin/bash ubuntu
-RUN echo "ubuntu:test" | chpasswd && adduser ubuntu sudo
-RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> \
-/etc/sudoers
-COPY docker_public_key.pub /home/ubuntu/.ssh/authorized_keys
+# 创建 ubuntu 用户并配置 sudo
+RUN useradd -m -s /bin/bash ubuntu && \
+    echo "ubuntu:test" | chpasswd && \
+    adduser ubuntu sudo && \
+    echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
+# 配置 SSH 密钥（从宿主机复制公钥）
+COPY docker_public_key.pub /home/ubuntu/.ssh/authorized_keys
+RUN mkdir -p /home/ubuntu/.ssh && \
+    chown -R ubuntu:ubuntu /home/ubuntu/.ssh && \
+    chmod 600 /home/ubuntu/.ssh/authorized_keys
+
+# 添加 GitHub 到 known_hosts（避免首次连接确认）
+RUN ssh-keyscan github.com >> /home/ubuntu/.ssh/known_hosts && \
+    chown ubuntu:ubuntu /home/ubuntu/.ssh/known_hosts
+
+# 设置 Git 全局代理（假设宿主机代理是 127.0.0.1:7890）
+# 注意：容器内需用 host.docker.internal 访问宿主机代理
+RUN git config --global http.proxy "http://host.docker.internal:7890" && \
+    git config --global https.proxy "http://host.docker.internal:7890"
+
+# 暴露 SSH 端口
 EXPOSE 22
 
+# 启动 SSH 服务
 RUN mkdir /var/run/sshd
 CMD ["/usr/sbin/sshd", "-D"]
