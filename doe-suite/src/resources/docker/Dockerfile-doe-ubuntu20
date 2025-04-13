@@ -43,5 +43,5 @@ RUN chmod +x /entrypoint.sh
 EXPOSE 22
 
 # 使用启动脚本
-ENTRYPOINT ["/entrypoint.sh"]
+#ENTRYPOINT ["/entrypoint.sh"]
 CMD ["/usr/sbin/sshd", "-D"]
