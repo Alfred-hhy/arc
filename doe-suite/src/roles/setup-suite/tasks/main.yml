@@ -94,12 +94,12 @@
 #    ssh-add /home/{{ ansible_user }}/.ssh/id_ec_arc
 #  args:
 #    executable: /bin/bash
-- name: Configure Git proxy in container
-  ansible.builtin.shell: |
-    git config --global http.proxy http://172.17.0.1:7890
-    git config --global https.proxy http://172.17.0.1:7890
-  become: true
-  become_user: ubuntu
+#- name: Configure Git proxy in container
+#  ansible.builtin.shell: |
+#    git config --global http.proxy http://172.17.0.1:7890
+#    git config --global https.proxy http://172.17.0.1:7890
+#  become: true
+#  become_user: ubuntu
 - name: Debug environment variables
   ansible.builtin.shell: env
   register: env_output

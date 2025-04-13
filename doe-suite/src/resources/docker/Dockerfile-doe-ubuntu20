@@ -8,9 +8,9 @@ RUN echo "ubuntu:test" | chpasswd && adduser ubuntu sudo
 RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 COPY docker_public_key.pub /home/ubuntu/.ssh/authorized_keys
 
-ENV http_proxy=http://172.17.0.1:7890
-ENV https_proxy=http://172.17.0.1:7890
-ENV all_proxy=http://172.17.0.1:7890
+ENV http_proxy=http://172.20.0.1:7890
+ENV https_proxy=http://172.20.0.1:7890
+ENV all_proxy=http://172.20.0.1:7890
 ENV no_proxy=localhost,127.0.0.1
 # 将代理配置写入用户的 .bashrc，确保 ssh 登录时生效
 RUN echo "export http_proxy=$http_proxy" >> /home/ubuntu/.bashrc && \
