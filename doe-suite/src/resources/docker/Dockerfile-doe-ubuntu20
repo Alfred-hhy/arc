@@ -4,8 +4,10 @@ FROM ubuntu:22.04
 RUN apt-get update && apt-get install -y openssh-server sudo rsync python3 && \
     rm -rf /var/lib/apt/lists/*
 
-# 配置 SSH
-RUN sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+# 配置 SSH 并创建运行时目录
+RUN sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+    mkdir -p /run/sshd && \
+    chmod 755 /run/sshd
 
 # 创建用户并配置权限
 RUN useradd -m -s /bin/bash ubuntu && \
@@ -15,12 +17,13 @@ RUN useradd -m -s /bin/bash ubuntu && \
 
 # 配置 SSH 公钥
 COPY docker_public_key.pub /home/ubuntu/.ssh/authorized_keys
-RUN chown ubuntu:ubuntu /home/ubuntu/.ssh/authorized_keys && \
+RUN mkdir -p /home/ubuntu/.ssh && \
+    chown ubuntu:ubuntu /home/ubuntu/.ssh /home/ubuntu/.ssh/authorized_keys && \
+    chmod 700 /home/ubuntu/.ssh && \
     chmod 600 /home/ubuntu/.ssh/authorized_keys
 
 # 添加 SSH 私钥
-RUN mkdir -p /home/ubuntu/.ssh && \
-    echo "-----BEGIN OPENSSH PRIVATE KEY-----\
+RUN echo "-----BEGIN OPENSSH PRIVATE KEY-----\
 b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtz\
 c2gtZWQyNTUxOQAAACAxHOdYhLPVPtgiQ9IH6InaYJOTe02QYsxh6Xm3IBJntwAA\
 AIjO80/dzvNP3QAAAAtzc2gtZWQyNTUxOQAAACAxHOdYhLPVPtgiQ9IH6InaYJOT\
@@ -35,13 +38,8 @@ RUN ssh-keyscan github.com >> /home/ubuntu/.ssh/known_hosts && \
     chown ubuntu:ubuntu /home/ubuntu/.ssh/known_hosts && \
     chmod 644 /home/ubuntu/.ssh/known_hosts
 
-# 添加启动脚本
-#COPY entrypoint.sh /entrypoint.sh
-#RUN #chmod +x /entrypoint.sh
-
 # 暴露 SSH 端口
 EXPOSE 22
 
-# 使用启动脚本
-#ENTRYPOINT ["/entrypoint.sh"]
+# 启动 SSH 服务
 CMD ["/usr/sbin/sshd", "-D"]
