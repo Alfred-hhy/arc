@@ -1,16 +1,47 @@
-
 FROM ubuntu:22.04
 
-RUN apt update && apt install -y openssh-server sudo rsync python3
+# 安装必要软件
+RUN apt-get update && apt-get install -y openssh-server sudo rsync python3 && \
+    rm -rf /var/lib/apt/lists/*
+
+# 配置 SSH
 RUN sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 
-RUN useradd -m -s /bin/bash ubuntu
-RUN echo "ubuntu:test" | chpasswd && adduser ubuntu sudo
-RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> \
-/etc/sudoers
+# 创建用户并配置权限
+RUN useradd -m -s /bin/bash ubuntu && \
+    echo "ubuntu:test" | chpasswd && \
+    adduser ubuntu sudo && \
+    echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+# 配置 SSH 公钥
 COPY docker_public_key.pub /home/ubuntu/.ssh/authorized_keys
-RUN mkdir -p -m 0700 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
+RUN chown ubuntu:ubuntu /home/ubuntu/.ssh/authorized_keys && \
+    chmod 600 /home/ubuntu/.ssh/authorized_keys
+
+# 添加 SSH 私钥
+RUN mkdir -p /home/ubuntu/.ssh && \
+    echo "-----BEGIN OPENSSH PRIVATE KEY-----\
+b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtz\
+c2gtZWQyNTUxOQAAACAxHOdYhLPVPtgiQ9IH6InaYJOTe02QYsxh6Xm3IBJntwAA\
+AIjO80/dzvNP3QAAAAtzc2gtZWQyNTUxOQAAACAxHOdYhLPVPtgiQ9IH6InaYJOT\
+e02QYsxh6Xm3IBJntwAAAEAwUQIBATAFBgMrZXAEIgQgHcshVwJn6+ej+ozT014f\
+2zEc51iEs9U+2CJD0gfoidpgk5N7TZBizGHpebcgEme3AAAAAAECAwQF\
+-----END OPENSSH PRIVATE KEY-----" > /home/ubuntu/.ssh/id_ec_arc && \
+    chown ubuntu:ubuntu /home/ubuntu/.ssh/id_ec_arc && \
+    chmod 600 /home/ubuntu/.ssh/id_ec_arc
+
+# 添加 GitHub 到 known_hosts
+RUN ssh-keyscan github.com >> /home/ubuntu/.ssh/known_hosts && \
+    chown ubuntu:ubuntu /home/ubuntu/.ssh/known_hosts && \
+    chmod 644 /home/ubuntu/.ssh/known_hosts
+
+# 添加启动脚本
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# 暴露 SSH 端口
 EXPOSE 22
 
-RUN mkdir /var/run/sshd
+# 使用启动脚本
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["/usr/sbin/sshd", "-D"]
