@@ -36,8 +36,8 @@ RUN ssh-keyscan github.com >> /home/ubuntu/.ssh/known_hosts && \
     chmod 644 /home/ubuntu/.ssh/known_hosts
 
 # 添加启动脚本
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+#COPY entrypoint.sh /entrypoint.sh
+#RUN #chmod +x /entrypoint.sh
 
 # 暴露 SSH 端口
 EXPOSE 22
