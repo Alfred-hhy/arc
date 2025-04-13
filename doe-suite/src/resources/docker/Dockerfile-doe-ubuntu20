@@ -8,17 +8,27 @@ RUN echo "ubuntu:test" | chpasswd && adduser ubuntu sudo
 RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 COPY docker_public_key.pub /home/ubuntu/.ssh/authorized_keys
 
+# 设置全局代理环境变量
+RUN echo 'http_proxy=http://172.20.0.1:7890' >> /etc/environment && \
+    echo 'https_proxy=http://172.20.0.1:7890' >> /etc/environment && \
+    echo 'all_proxy=http://172.20.0.1:7890' >> /etc/environment && \
+    echo 'no_proxy=localhost,127.0.0.1' >> /etc/environment
+
+# 配置 Git 代理（确保 Git 默认使用代理）
+RUN git config --global http.proxy http://172.20.0.1:7890 && \
+    git config --global https.proxy http://172.20.0.1:7890
+
+# 确保 .bashrc 仍然包含代理（可选，供交互式会话）
 ENV http_proxy=http://172.20.0.1:7890
 ENV https_proxy=http://172.20.0.1:7890
 ENV all_proxy=http://172.20.0.1:7890
 ENV no_proxy=localhost,127.0.0.1
-# 将代理配置写入用户的 .bashrc，确保 ssh 登录时生效
 RUN echo "export http_proxy=$http_proxy" >> /home/ubuntu/.bashrc && \
     echo "export https_proxy=$https_proxy" >> /home/ubuntu/.bashrc && \
     echo "export all_proxy=$all_proxy" >> /home/ubuntu/.bashrc && \
     echo "export no_proxy=$no_proxy" >> /home/ubuntu/.bashrc
 
-# 确保 .bashrc 文件权限正确
+# 确保文件权限
 RUN chown ubuntu:ubuntu /home/ubuntu/.ssh/authorized_keys && \
     chown ubuntu:ubuntu /home/ubuntu/.bashrc
 
