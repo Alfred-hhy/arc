@@ -100,15 +100,15 @@
 #    git config --global https.proxy http://172.17.0.1:7890
 #  become: true
 #  become_user: ubuntu
-- name: Debug environment variables
-  ansible.builtin.shell: env
-  register: env_output
-  tags: [debug]
+#- name: Debug environment variables
+#  ansible.builtin.shell: env
+#  register: env_output
+#  tags: [debug]
 
-- name: Print environment variables
-  debug:
-    msg: "{{ env_output.stdout_lines }}"
-  tags: [debug]
+#- name: Print environment variables
+#  debug:
+#    msg: "{{ env_output.stdout_lines }}"
+#  tags: [debug]
 - name: Update Code from Git remote repository (or multiple)  [if this fails, did you setup ssh-agent (see docs)?]
   git:
     repo: "{{ git_repo.repo }}"
