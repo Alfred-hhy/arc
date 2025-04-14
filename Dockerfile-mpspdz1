@@ -21,7 +21,8 @@ RUN mkdir /home/ubuntu/.ssh
 COPY docker_public_key.pub /home/ubuntu/.ssh/authorized_keys
 RUN mkdir -p -m 0700 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
 
-RUN --mount=type=ssh,mode=0666 git clone --recurse-submodules git@github.com:Alfred-hhy/arc.git /home/ubuntu/code
+
+RUN --mount=type=ssh git clone https://github.com/Alfred-hhy/arc.git /home/ubuntu/code
 
 RUN sed -i 's/-DSSL_DIR="Player-Data\/"/-DSSL_DIR="Player-SSL-Data\/"/' /home/ubuntu/code/MP-SPDZ/CONFIG
 RUN sed -i 's/-DPREP_DIR="Player-Prep-Data\/"/-DPREP_DIR="Player-Data\/"/' /home/ubuntu/code/MP-SPDZ/CONFIG

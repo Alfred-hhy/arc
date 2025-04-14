@@ -1,45 +1,35 @@
-FROM arc:latest
+# syntax=docker/dockerfile:experimental
 
-# 使用 root 用户执行需要权限的操作
-USER root
+FROM ubuntu:22.04
 
-# 设置全局代理环境变量（适用于非交互式会话）
-RUN echo 'http_proxy=http://172.18.0.1:7890' >> /etc/environment && \
-    echo 'https_proxy=http://172.18.0.1:7890' >> /etc/environment && \
-    echo 'all_proxy=http://172.18.0.1:7890' >> /etc/environment && \
-    echo 'no_proxy=localhost,127.0.0.1' >> /etc/environment
+ARG DEBIAN_FRONTEND=noninteractive
+RUN apt update && apt install -y openssh-server sudo rsync python3 openssh-client git curl
+RUN sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 
-# 确保 ubuntu 用户存在并有 sudo 权限
-RUN if ! id -u ubuntu > /dev/null 2>&1; then \
-        useradd -m -s /bin/bash ubuntu; \
-        echo "ubuntu:test" | chpasswd; \
-        usermod -aG sudo ubuntu; \
-    fi && \
-    echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+RUN useradd -m -s /bin/bash ubuntu
+RUN echo "ubuntu:test" | chpasswd && adduser ubuntu sudo
+RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> \
+/etc/sudoers
 
-# 切换到 ubuntu 用户
+# compile and clone-mp-spdz
+# in the future we could make these depend on suite vars?
+RUN apt update && apt install -y automake build-essential clang git libboost-filesystem-dev libboost-thread-dev libboost-iostreams-dev libntl-dev libgmp-dev libsodium-dev libssl-dev libtool m4 python3 texinfo cmake yasm pkg-config
+
 USER ubuntu
-WORKDIR /home/ubuntu
 
-# 配置 Git 代理（无需 sudo，写入用户目录 ~/.gitconfig）
-RUN git config --global http.proxy http://172.18.0.1:7890 && \
-    git config --global https.proxy http://172.18.0.1:7890
+RUN mkdir /home/ubuntu/.ssh
+COPY docker_public_key.pub /home/ubuntu/.ssh/authorized_keys
+RUN mkdir -p -m 0700 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
 
-## 安装 Rust
-#RUN curl https://sh.rustup.rs -sSf | bash -s -- -y && \
-#    . $HOME/.cargo/env && \
-#    rustup install 1.76.0 && \
-#    rustup default nightly-2024-02-04
-#
-## 为交互式会话配置 Rust 环境
-#RUN echo 'source $HOME/.cargo/env' >> $HOME/.bashrc
-#
-## 构建 mpc-consistency（假设目录存在）
-#RUN . $HOME/.cargo/env && \
-#    cd /home/ubuntu/mpc-consistency && \
-#    cargo build --release --features parallel
-#
-## 构建 MP-SPDZ（假设目录存在）
-#RUN cd /home/ubuntu/code/MP-SPDZ && \
-#    make -j8 libff && \
-#    make -j8 replicated-ring-party.x rep-ring-switch-party.x semi2k-party.x
+
+RUN --mount=type=ssh git clone https://github.com/Alfred-hhy/arc.git /home/ubuntu/code
+
+RUN sed -i 's/-DSSL_DIR="Player-Data\/"/-DSSL_DIR="Player-SSL-Data\/"/' /home/ubuntu/code/MP-SPDZ/CONFIG
+RUN sed -i 's/-DPREP_DIR="Player-Prep-Data\/"/-DPREP_DIR="Player-Data\/"/' /home/ubuntu/code/MP-SPDZ/CONFIG
+
+
+USER root
+EXPOSE 22
+
+RUN mkdir /var/run/sshd
+CMD ["/usr/sbin/sshd", "-D"]
