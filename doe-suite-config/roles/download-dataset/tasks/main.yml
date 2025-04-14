@@ -43,8 +43,7 @@
     mode: '0755'
   loop: "{{ dataset_dirs_stat.results }}"
   when: not item.stat.exists
-  loop_control:
-    loop_var: item
+
 
 - name: Unarchive a file if not already extracted
   ansible.builtin.unarchive:
@@ -53,5 +52,3 @@
     remote_src: yes
   loop: "{{ dataset_dirs_stat.results }}"
   when: not item.stat.exists
-  loop_control:
-    loop_var: item
