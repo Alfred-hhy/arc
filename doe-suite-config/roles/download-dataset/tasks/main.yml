@@ -27,9 +27,7 @@
     paths: "{{ dataset_dir }}"
     patterns: "*.zip"
   register: my_zip_files
-- name: 调试 exp_code_dir
-  ansible.builtin.debug:
-    var: exp_code_dir
+
 - name: Check if dataset directories already exist
   ansible.builtin.stat:
     path: "{{ exp_code_dir }}/MP-SPDZ/Player-Data/{{ file.path | basename | split('.') | first }}"
@@ -44,7 +42,7 @@
     state: directory
     mode: '0755'
   loop: "{{ dataset_dirs_stat.results }}"
-  when: not stat.exists
+  when: not item.stat.exists
   loop_control:
     loop_var: item
 
@@ -54,6 +52,6 @@
     dest: "{{ exp_code_dir }}/MP-SPDZ/Player-Data/{{ item.item.file.path | basename | split('.') | first }}"
     remote_src: yes
   loop: "{{ dataset_dirs_stat.results }}"
-  when: not stat.exists
+  when: not item.stat.exists
   loop_control:
     loop_var: item
