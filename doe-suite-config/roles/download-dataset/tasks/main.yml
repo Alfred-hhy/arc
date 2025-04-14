@@ -36,22 +36,22 @@
     loop_var: file
   register: dataset_dirs_stat
 
+- name: Debug dataset_dirs_stat.results
+  ansible.builtin.debug:
+    var: dataset_dirs_stat.results
+
 - name: Create a directory if it does not exist (for each dataset)
   ansible.builtin.file:
-    path: "{{ exp_code_dir }}/MP-SPDZ/Player-Data/{{ item.item.file.path | basename | split('.') | first }}"
+    path: "{{ exp_code_dir }}/MP-SPDZ/Player-Data/{{ item.file.path | basename | split('.') | first }}"
     state: directory
     mode: '0755'
   loop: "{{ dataset_dirs_stat.results }}"
   when: not item.stat.exists
-  loop_control:
-    loop_var: item
 
 - name: Unarchive a file if not already extracted
   ansible.builtin.unarchive:
-    src: "{{ item.item.file.path }}"
-    dest: "{{ exp_code_dir }}/MP-SPDZ/Player-Data/{{ item.item.file.path | basename | split('.') | first }}"
+    src: "{{ item.file.path }}"
+    dest: "{{ exp_code_dir }}/MP-SPDZ/Player-Data/{{ item.file.path | basename | split('.') | first }}"
     remote_src: yes
   loop: "{{ dataset_dirs_stat.results }}"
   when: not item.stat.exists
-  loop_control:
-    loop_var: item
