@@ -48,7 +48,7 @@
 
 - name: Unarchive a file if not already extracted
   ansible.builtin.unarchive:
-    src: "{{ item.item.file.path }}"
+    src: "{{ item.file.path }}"
     dest: "{{ exp_code_dir }}/MP-SPDZ/Player-Data/{{ item.file.path | basename | split('.') | first }}"
     remote_src: yes
   loop: "{{ dataset_dirs_stat.results }}"
