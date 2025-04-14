@@ -25,21 +25,21 @@ WORKDIR /home/ubuntu
 RUN git config --global http.proxy http://172.18.0.1:7890 && \
     git config --global https.proxy http://172.18.0.1:7890
 
-# 安装 Rust
-RUN curl https://sh.rustup.rs -sSf | bash -s -- -y && \
-    . $HOME/.cargo/env && \
-    rustup install 1.76.0 && \
-    rustup default nightly-2024-02-04
-
-# 为交互式会话配置 Rust 环境
-RUN echo 'source $HOME/.cargo/env' >> $HOME/.bashrc
-
-# 构建 mpc-consistency（假设目录存在）
-RUN . $HOME/.cargo/env && \
-    cd /home/ubuntu/mpc-consistency && \
-    cargo build --release --features parallel
-
-# 构建 MP-SPDZ（假设目录存在）
-RUN cd /home/ubuntu/code/MP-SPDZ && \
-    make -j8 libff && \
-    make -j8 replicated-ring-party.x rep-ring-switch-party.x semi2k-party.x
+## 安装 Rust
+#RUN curl https://sh.rustup.rs -sSf | bash -s -- -y && \
+#    . $HOME/.cargo/env && \
+#    rustup install 1.76.0 && \
+#    rustup default nightly-2024-02-04
+#
+## 为交互式会话配置 Rust 环境
+#RUN echo 'source $HOME/.cargo/env' >> $HOME/.bashrc
+#
+## 构建 mpc-consistency（假设目录存在）
+#RUN . $HOME/.cargo/env && \
+#    cd /home/ubuntu/mpc-consistency && \
+#    cargo build --release --features parallel
+#
+## 构建 MP-SPDZ（假设目录存在）
+#RUN cd /home/ubuntu/code/MP-SPDZ && \
+#    make -j8 libff && \
+#    make -j8 replicated-ring-party.x rep-ring-switch-party.x semi2k-party.x
