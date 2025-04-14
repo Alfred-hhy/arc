@@ -10,7 +10,7 @@ def client_thread(conn, addr, all_connections, expected_clients):
     conn.recv(1024)  # Wait for a ready signal from the client
     all_connections.append(conn)
     while len(all_connections) < expected_clients:
-        time.sleep(1)
+        #time.sleep1)
         pass  # Wait until all clients are connected
     conn.sendall(b"GO")  # Signal the client to proceed
     conn.close()

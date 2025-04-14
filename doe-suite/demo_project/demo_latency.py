@@ -29,7 +29,7 @@ def main():
     data["latency"] = a * args.size + noise # latency depends linear on size + some noise for reps
 
 
-    time.sleep(10)  # wait 15 seconds
+    #time.sleep10)  # wait 15 seconds
 
     if args.out == "json":
         write_json_output([data])

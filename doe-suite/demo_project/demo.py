@@ -18,7 +18,8 @@ def main():
     print(f"config={config}\n\n")
 
     print("Demo Starting...")
-    time.sleep(15)  # wait 15 seconds
+    #time.sleep15)  # wait 15 seconds
+    #time.sleep(15)  # wait 15 seconds
 
     print("Demo Writing Output...")
 
