@@ -44,7 +44,7 @@
     state: directory
     mode: '0755'
   loop: "{{ dataset_dirs_stat.results }}"
-  when: not item.stat.exists
+  when: not stat.exists
   loop_control:
     loop_var: item
 
@@ -54,6 +54,6 @@
     dest: "{{ exp_code_dir }}/MP-SPDZ/Player-Data/{{ item.item.file.path | basename | split('.') | first }}"
     remote_src: yes
   loop: "{{ dataset_dirs_stat.results }}"
-  when: not item.stat.exists
+  when: not stat.exists
   loop_control:
     loop_var: item
