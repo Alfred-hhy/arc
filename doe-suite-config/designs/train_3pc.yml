@@ -109,47 +109,47 @@ sh:
 #        custom_prime: '8444461749428370424248824938781546531375899335154063827935233455917409239041'
 
 
-#mal:
-#  n_repetitions: 1
-#  host_types:
-#    consistency:
-#      n: 3
-#      check_status: True
-#      init_roles:
-#        - setup-base
+mal:
+  n_repetitions: 1
+  host_types:
+    consistency:
+      n: 3
+      check_status: True
+      init_roles:
+        - setup-base
+        - download-dataset
+        - setup-consistency
 #        - download-dataset
-#        - setup-consistency
-##        - download-dataset
-#      #        - setup-largeprimes
-#      #        - setup-network-delay # adjust latency + bandwidth limit -> doe-suite-config/roles/setup-network-delay/vars/main.yml
-#      $CMD$:
-#        - main: "[% my_run.cmd_mpspdz | replace('<PLAYER-ID>', 0) %]"
-#        - main: "[% my_run.cmd_mpspdz | replace('<PLAYER-ID>', 1) %]"
-#        - main: "[% my_run.cmd_mpspdz | replace('<PLAYER-ID>', 2) %]"
-#
-#  base_experiment:
-#    consistency_args:
-#      type:
-#          $FACTOR$: [ sha3s, cerebro, pc ]
-#    convert_chunk_size: 100000
-#
-#    network_type: lan
-#    mpc_type: mal
-#
-#    sleep_time: 10
-#
-#    mpc:
-#      script_args:
-#        batch_size: 64
-#        n_batches: 50
-#
-#  factor_levels:
-#
-#    - mpc:
-#        protocol_setup: "sy-rep-ring-party"
-#        domain: ring
-#        compiler_args: [ '-R', '64', '-C', '--budget', "[% my_run._runtime_info.budget %]", '-D', '-Z', '3' ]
-#        custom_prime: null
+      #        - setup-largeprimes
+      #        - setup-network-delay # adjust latency + bandwidth limit -> doe-suite-config/roles/setup-network-delay/vars/main.yml
+      $CMD$:
+        - main: "[% my_run.cmd_mpspdz | replace('<PLAYER-ID>', 0) %]"
+        - main: "[% my_run.cmd_mpspdz | replace('<PLAYER-ID>', 1) %]"
+        - main: "[% my_run.cmd_mpspdz | replace('<PLAYER-ID>', 2) %]"
+
+  base_experiment:
+    consistency_args:
+      type:
+          $FACTOR$: [ sha3s, cerebro, pc ]
+    convert_chunk_size: 100000
+
+    network_type: lan
+    mpc_type: mal
+
+    sleep_time: 10
+
+    mpc:
+      script_args:
+        batch_size: 64
+        n_batches: 50
+
+  factor_levels:
+
+    - mpc:
+        protocol_setup: "sy-rep-ring-party"
+        domain: ring
+        compiler_args: [ '-R', '64', '-C', '--budget', "[% my_run._runtime_info.budget %]", '-D', '-Z', '3' ]
+        custom_prime: null
 
 #    - mpc:
 #        protocol_setup: "sy-rep-field-party"
