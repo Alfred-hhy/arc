@@ -2,29 +2,12 @@
 
 FROM mpspdz:latest
 
-# 确保SSH相关配置正确
-RUN sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+# 确保 SSH 服务端配置正确
+RUN sed -i 's/#PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+    mkdir -p /var/run/sshd
 
-# 确保用户和权限设置正确
-RUN echo "ubuntu:test" | chpasswd && adduser ubuntu sudo
-RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
-
-# 确保必要的软件包已安装
-RUN apt update && apt install -y openssh-server sudo rsync python3 openssh-client git curl automake build-essential clang libboost-filesystem-dev libboost-thread-dev libboost-iostreams-dev libntl-dev libgmp-dev libsodium-dev libssl-dev libtool m4 python3 texinfo cmake yasm pkg-config
-
-# 设置用户环境
-USER ubuntu
-RUN mkdir -p /home/ubuntu/.ssh && chmod 700 /home/ubuntu/.ssh
-RUN mkdir -p -m 0700 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
-
-# 切换回root用户进行最终设置
-USER root
-
-# 确保SSH目录存在
-RUN mkdir -p /var/run/sshd
-
-# 暴露SSH端口
+# 暴露 SSH 端口
 EXPOSE 22
 
-# 启动SSH服务
+# 启动 SSH 服务
 CMD ["/usr/sbin/sshd", "-D"]
