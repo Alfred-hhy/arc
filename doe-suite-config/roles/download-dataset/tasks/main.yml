@@ -28,9 +28,6 @@
     patterns: "*.zip"
   register: my_zip_files
 
-- name: 调试 my_zip_files
-  ansible.builtin.debug:
-    var: my_zip_files
 - name: Check if dataset directories already exist
   ansible.builtin.stat:
     path: "{{ exp_code_dir }}/MP-SPDZ/Player-Data/{{ file.path | basename | split('.') | first }}"
@@ -41,7 +38,7 @@
 
 - name: Create a directory if it does not exist (for each dataset)
   ansible.builtin.file:
-    path: "{{ exp_code_dir }}/MP-SPDZ/Player-Data/{{ item.item.file.path | basename | split('.') | first }}"
+    path: "{{ exp_code_dir }}/MP-SPDZ/Player-Data/{{ item.file.path | basename | split('.') | first }}"
     state: directory
     mode: '0755'
   loop: "{{ dataset_dirs_stat.results }}"
@@ -52,7 +49,7 @@
 - name: Unarchive a file if not already extracted
   ansible.builtin.unarchive:
     src: "{{ item.item.file.path }}"
-    dest: "{{ exp_code_dir }}/MP-SPDZ/Player-Data/{{ item.item.file.path | basename | split('.') | first }}"
+    dest: "{{ exp_code_dir }}/MP-SPDZ/Player-Data/{{ item.file.path | basename | split('.') | first }}"
     remote_src: yes
   loop: "{{ dataset_dirs_stat.results }}"
   when: not item.stat.exists
