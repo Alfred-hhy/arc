@@ -1,35 +1,30 @@
 # syntax=docker/dockerfile:experimental
 
-FROM ubuntu:22.04
+FROM mpspdz:latest
 
-ARG DEBIAN_FRONTEND=noninteractive
-RUN apt update && apt install -y openssh-server sudo rsync python3 openssh-client git curl
+# 确保SSH相关配置正确
 RUN sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 
-RUN useradd -m -s /bin/bash ubuntu
+# 确保用户和权限设置正确
 RUN echo "ubuntu:test" | chpasswd && adduser ubuntu sudo
-RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> \
-/etc/sudoers
+RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
-# compile and clone-mp-spdz
-# in the future we could make these depend on suite vars?
-RUN apt update && apt install -y automake build-essential clang git libboost-filesystem-dev libboost-thread-dev libboost-iostreams-dev libntl-dev libgmp-dev libsodium-dev libssl-dev libtool m4 python3 texinfo cmake yasm pkg-config
+# 确保必要的软件包已安装
+RUN apt update && apt install -y openssh-server sudo rsync python3 openssh-client git curl automake build-essential clang libboost-filesystem-dev libboost-thread-dev libboost-iostreams-dev libntl-dev libgmp-dev libsodium-dev libssl-dev libtool m4 python3 texinfo cmake yasm pkg-config
 
+# 设置用户环境
 USER ubuntu
-
-RUN mkdir /home/ubuntu/.ssh
-COPY docker_public_key.pub /home/ubuntu/.ssh/authorized_keys
+RUN mkdir -p /home/ubuntu/.ssh && chmod 700 /home/ubuntu/.ssh
 RUN mkdir -p -m 0700 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
 
-
-RUN --mount=type=ssh git clone https://github.com/Alfred-hhy/arc.git /home/ubuntu/code
-
-RUN sed -i 's/-DSSL_DIR="Player-Data\/"/-DSSL_DIR="Player-SSL-Data\/"/' /home/ubuntu/code/MP-SPDZ/CONFIG
-RUN sed -i 's/-DPREP_DIR="Player-Prep-Data\/"/-DPREP_DIR="Player-Data\/"/' /home/ubuntu/code/MP-SPDZ/CONFIG
-
-
+# 切换回root用户进行最终设置
 USER root
+
+# 确保SSH目录存在
+RUN mkdir -p /var/run/sshd
+
+# 暴露SSH端口
 EXPOSE 22
 
-RUN mkdir /var/run/sshd
+# 启动SSH服务
 CMD ["/usr/sbin/sshd", "-D"]
