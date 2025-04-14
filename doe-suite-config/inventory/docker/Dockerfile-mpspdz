@@ -1,40 +1,45 @@
-# syntax=docker/dockerfile:experimental
 FROM arc:latest
 
+# 使用 root 用户执行需要权限的操作
+USER root
+
+# 设置全局代理环境变量（适用于非交互式会话）
+RUN echo 'http_proxy=http://172.18.0.1:7890' >> /etc/environment && \
+    echo 'https_proxy=http://172.18.0.1:7890' >> /etc/environment && \
+    echo 'all_proxy=http://172.18.0.1:7890' >> /etc/environment && \
+    echo 'no_proxy=localhost,127.0.0.1' >> /etc/environment
+
+# 确保 ubuntu 用户存在并有 sudo 权限
+RUN if ! id -u ubuntu > /dev/null 2>&1; then \
+        useradd -m -s /bin/bash ubuntu; \
+        echo "ubuntu:test" | chpasswd; \
+        usermod -aG sudo ubuntu; \
+    fi && \
+    echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+# 切换到 ubuntu 用户
 USER ubuntu
 WORKDIR /home/ubuntu
 
-# 设置全局代理环境变量（适用于非交互式会话）
-RUN sudo sh -c "echo 'http_proxy=http://172.18.0.1:7890' >> /etc/environment && \
-                echo 'https_proxy=http://172.18.0.1:7890' >> /etc/environment && \
-                echo 'all_proxy=http://172.18.0.1:7890' >> /etc/environment && \
-                echo 'no_proxy=localhost,127.0.0.1' >> /etc/environment"
-
-# 配置 Git 代理（确保 Git 默认使用代理）
+# 配置 Git 代理（无需 sudo，写入用户目录 ~/.gitconfig）
 RUN git config --global http.proxy http://172.18.0.1:7890 && \
     git config --global https.proxy http://172.18.0.1:7890
 
-# 确保 .bashrc 仍然包含代理（可选，供交互式会话）
-ENV http_proxy=http://172.18.0.1:7890
-ENV https_proxy=http://172.18.0.1:7890
-ENV all_proxy=http://172.18.0.1:7890
-ENV no_proxy=localhost,127.0.0.1
-RUN echo "export http_proxy=$http_proxy" >> /home/ubuntu/.bashrc && \
-    echo "export https_proxy=$https_proxy" >> /home/ubuntu/.bashrc && \
-    echo "export all_proxy=$all_proxy" >> /home/ubuntu/.bashrc && \
-    echo "export no_proxy=$no_proxy" >> /home/ubuntu/.bashrc
+# 安装 Rust
+RUN curl https://sh.rustup.rs -sSf | bash -s -- -y && \
+    . $HOME/.cargo/env && \
+    rustup install 1.76.0 && \
+    rustup default nightly-2024-02-04
 
-# Install Rust
-RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
+# 为交互式会话配置 Rust 环境
 RUN echo 'source $HOME/.cargo/env' >> $HOME/.bashrc
 
-# Configure Rust toolchains
-RUN . $HOME/.cargo/env && rustup install 1.76.0
-RUN . $HOME/.cargo/env && rustup default nightly-2024-02-04
+# 构建 mpc-consistency（假设目录存在）
+RUN . $HOME/.cargo/env && \
+    cd /home/ubuntu/mpc-consistency && \
+    cargo build --release --features parallel
 
-# Clone and build mpc-consistency (uncomment if needed)
-RUN . $HOME/.cargo/env && cd /home/ubuntu/mpc-consistency && cargo build --release --features parallel
-
-# Compile MP-SPDZ components (only if not already done in arc:latest)
-RUN cd /home/ubuntu/code/MP-SPDZ && make -j8 libff
-RUN cd /home/ubuntu/code/MP-SPDZ && make -j8 replicated-ring-party.x rep-ring-switch-party.x semi2k-party.x
+# 构建 MP-SPDZ（假设目录存在）
+RUN cd /home/ubuntu/code/MP-SPDZ && \
+    make -j8 libff && \
+    make -j8 replicated-ring-party.x rep-ring-switch-party.x semi2k-party.x
