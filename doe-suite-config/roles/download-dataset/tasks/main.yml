@@ -31,7 +31,6 @@
 - name: 调试 my_zip_files
   ansible.builtin.debug:
     var: my_zip_files
-
 - name: Check if dataset directories already exist
   ansible.builtin.stat:
     path: "{{ exp_code_dir }}/MP-SPDZ/Player-Data/{{ file.path | basename | split('.') | first }}"
@@ -47,7 +46,8 @@
     mode: '0755'
   loop: "{{ dataset_dirs_stat.results }}"
   when: not item.stat.exists
-
+  loop_control:
+    loop_var: item
 
 - name: Unarchive a file if not already extracted
   ansible.builtin.unarchive:
@@ -56,3 +56,5 @@
     remote_src: yes
   loop: "{{ dataset_dirs_stat.results }}"
   when: not item.stat.exists
+  loop_control:
+    loop_var: item
