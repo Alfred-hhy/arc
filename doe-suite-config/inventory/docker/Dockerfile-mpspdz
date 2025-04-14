@@ -5,19 +5,19 @@ USER ubuntu
 WORKDIR /home/ubuntu
 
 # 设置全局代理环境变量
-RUN echo 'http_proxy=http://172.20.0.1:7890' >> /etc/environment && \
-    echo 'https_proxy=http://172.20.0.1:7890' >> /etc/environment && \
-    echo 'all_proxy=http://172.20.0.1:7890' >> /etc/environment && \
+RUN echo 'http_proxy=http://172.18.0.1:7890' >> /etc/environment && \
+    echo 'https_proxy=http://172.18.0.1:7890' >> /etc/environment && \
+    echo 'all_proxy=http://172.18.0.1:7890' >> /etc/environment && \
     echo 'no_proxy=localhost,127.0.0.1' >> /etc/environment
 
 # 配置 Git 代理（确保 Git 默认使用代理）
-RUN git config --global http.proxy http://172.20.0.1:7890 && \
-    git config --global https.proxy http://172.20.0.1:7890
+RUN git config --global http.proxy http://172.18.0.1:7890 && \
+    git config --global https.proxy http://172.18.0.1:7890
 
 # 确保 .bashrc 仍然包含代理（可选，供交互式会话）
-ENV http_proxy=http://172.20.0.1:7890
-ENV https_proxy=http://172.20.0.1:7890
-ENV all_proxy=http://172.20.0.1:7890
+ENV http_proxy=http://172.18.0.1:7890
+ENV https_proxy=http://172.18.0.1:7890
+ENV all_proxy=http://172.18.0.1:7890
 ENV no_proxy=localhost,127.0.0.1
 RUN echo "export http_proxy=$http_proxy" >> /home/ubuntu/.bashrc && \
     echo "export https_proxy=$https_proxy" >> /home/ubuntu/.bashrc && \
@@ -33,7 +33,6 @@ RUN . $HOME/.cargo/env && rustup install 1.76.0
 RUN . $HOME/.cargo/env && rustup default nightly-2024-02-04
 
 # Clone and build mpc-consistency (uncomment if needed)
-RUN --mount=type=ssh,mode=0666 git clone git@github.com:hiddely/mpc-consistency.git /home/ubuntu/mpc-consistency
 RUN . $HOME/.cargo/env && cd /home/ubuntu/mpc-consistency && cargo build --release --features parallel
 
 # Compile MP-SPDZ components (only if not already done in arc:latest)
