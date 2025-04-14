@@ -173,13 +173,13 @@
 # Terminate all instances that are not assigned but have the matching prj_id and suite tag
 ######################################################
 
-#- name: Terminate all instances that are not assigned but have the matching prj_id and suite tag
-#  include_role:
-#    name: suite-cloud-instances-delete
-#    tasks_from: docker
-#  vars:
-#    filter_by_suite: True
-#    instance_ids_in_use: "{{ tag_assignment_lst | json_query('[*].instance_id') }}"
+- name: Terminate all instances that are not assigned but have the matching prj_id and suite tag
+  include_role:
+    name: suite-cloud-instances-delete
+    tasks_from: docker
+  vars:
+    filter_by_suite: True
+    instance_ids_in_use: "{{ tag_assignment_lst | json_query('[*].instance_id') }}"
 
 
 ######################################################

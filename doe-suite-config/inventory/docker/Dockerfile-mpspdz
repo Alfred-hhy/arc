@@ -13,10 +13,6 @@ RUN echo 'http_proxy=http://172.18.0.1:7890' >> /etc/environment && \
     echo 'all_proxy=http://172.18.0.1:7890' >> /etc/environment && \
     echo 'no_proxy=localhost,127.0.0.1' >> /etc/environment \
 # 安装 Rust/Cargo
-RUN wget https://sh.rustup.rs -O /tmp/sh.rustup.rs && \
-    chmod +x /tmp/sh.rustup.rs && \
-    /tmp/sh.rustup.rs -y && \
-    echo 'source $HOME/.cargo/env' >> ~/.bashrc
 
 # 验证安装（可选）
 RUN cargo --version
