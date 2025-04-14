@@ -28,6 +28,10 @@
     patterns: "*.zip"
   register: my_zip_files
 
+- name: 调试 my_zip_files
+  ansible.builtin.debug:
+    var: my_zip_files
+
 - name: Check if dataset directories already exist
   ansible.builtin.stat:
     path: "{{ exp_code_dir }}/MP-SPDZ/Player-Data/{{ file.path | basename | split('.') | first }}"
