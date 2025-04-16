@@ -22,7 +22,7 @@ class AuditConfig(config.BaseAuditModel):
     radius: float = 0.34
     sigma: float = 0.5
     batch_size: int = 16
-    n: int =  16
+    n: int =  128
     alpha: float = 0.001 # 1-alpha is the confidence level
 
 
