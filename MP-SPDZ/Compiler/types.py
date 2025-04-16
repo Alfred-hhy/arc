@@ -658,8 +658,7 @@ class _secret_structure(_structure):
                     else:
                         t = numpy.int64
                 if one_hot:
-                    num_classes = int(content.max()) + 1
-                    content = numpy.eye(num_classes)[content.astype(int)]
+                    content = numpy.eye(content.max() + 1)[content]
                 content = content.astype(t)
                 f = program.get_binary_input_file(player)
                 f.write(content.tobytes())
