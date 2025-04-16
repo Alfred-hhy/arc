@@ -21,7 +21,7 @@ class AuditConfig(config.BaseAuditModel):
     # parameters taken from paper used on their MNIST model
     radius: float = 0.34
     sigma: float = 0.5
-    batch_size: int = 16
+    batch_size: int = 64
     n: int =  64
     alpha: float = 0.001 # 1-alpha is the confidence level
 
