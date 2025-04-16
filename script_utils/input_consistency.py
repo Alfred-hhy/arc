@@ -45,6 +45,8 @@ def check(inputs: InputObject, player_input_id, type, n_threads, sha3_approx_fac
     else:
         raise ValueError("Unknown type %s", type)
 
+    print("=================")
+    print("type",type)
     print("Done with input consistency check")
 
 def compute_and_output_poly_array(input_objects: InputObject, player_input_id, n_threads):
@@ -374,7 +376,8 @@ def output(inputs: InputObject, type, n_threads: int, sha3_approx_factor: int, c
         compute_cerebro_individual(inputs, None, n_threads, cerebro_output_approx_factor)
     else:
         raise ValueError("Unknown type %s", type)
-
+    print("=================")
+    print("type",type)
     print("Done with input consistency check")
 
 def output_format(inputs: InputObject):
