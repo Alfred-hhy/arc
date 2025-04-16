@@ -88,6 +88,8 @@ class CifarInputLoader(AbstractInputLoader):
     def _load_model(self, input_shape, batch_size, input_via):
 
         pt_model = torch.load(f"Player-Data/{self._dataset}/mpc_model.pt")
+        print("Model loaded:", pt_model)
+
         layers = ml.layers_from_torch(pt_model, input_shape, batch_size, input_via=input_via)
 
         model = ml.SGD(layers)
