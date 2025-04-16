@@ -22,7 +22,7 @@ class AuditConfig(config.BaseAuditModel):
     L: float = 2.97
     theta: float = 1 # NOTE: I don't understand how they set this for adult
     batch_size: int = 16
-    n: int =  1024
+    n: int =  10
     alpha: float = 0.001 # 1-alpha is the confidence level
 
 
