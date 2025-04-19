@@ -1,23 +1,15 @@
 # syntax=docker/dockerfile:experimental
+FROM mpspdz:flatten
 
-FROM mpspdz:latest
+# 设置全局代理，既影响后续 RUN，也会留到最终镜像里
+ENV http_proxy="http://172.18.0.1:7890" \
+    https_proxy="http://172.18.0.1:7890" \
+    all_proxy="http://172.18.0.1:7890" \
+    no_proxy="localhost,127.0.0.1"
 
 # 确保 SSH 服务端配置正确
 RUN sed -i 's/#PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config && \
     mkdir -p /var/run/sshd
 
-
-### 设置全局代理环境变量
-##RUN echo 'http_proxy=http://172.18.0.1:7890' >> /etc/environment && \
-##    echo 'https_proxy=http://172.18.0.1:7890' >> /etc/environment && \
-##    echo 'all_proxy=http://172.18.0.1:7890' >> /etc/environment && \
-##    echo 'no_proxy=localhost,127.0.0.1' >> /etc/environment \
-## 安装 Rust/Cargo
-#
-## 验证安装（可选）
-#RUN cargo --version
-# 暴露 SSH 端口
 EXPOSE 22
-
-# 启动 SSH 服务
-CMD ["/usr/sbin/sshd", "-D"]
+CMD ["/usr/sbin/sshd","-D"]

@@ -36,9 +36,9 @@
     loop_var: file
   register: dataset_dirs_stat
 
-- name: Debug dataset_dirs_stat.results
-  ansible.builtin.debug:
-    var: dataset_dirs_stat.results
+#- name: Debug dataset_dirs_stat.results
+#  ansible.builtin.debug:
+#    var: dataset_dirs_stat.results
 
 - name: Create a directory if it does not exist (for each dataset)
   ansible.builtin.file:
