@@ -20,7 +20,7 @@ minimal: # experiment name
       n: 1
       init_roles:
 #        - setup-base
-        - download-dataset
+#        - download-dataset
         - setup-consistency
       $CMD$: "echo \"[% my_run.arg1 %] [% my_run.arg2 %][% my_run.arg3 %] \"" # command to start experiment run
   base_experiment:
