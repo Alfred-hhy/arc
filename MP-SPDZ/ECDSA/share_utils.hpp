@@ -1,18 +1,7 @@
 
 #ifndef SHARE_UTILS_HPP
 #define SHARE_UTILS_HPP
-#include <sys/stat.h>    // for stat()
 
-// 简单封装，打印某个时刻的文件字节数
-static void debug_print_file_size(const std::string& fn, const char* when) {
-    struct stat st;
-    if (stat(fn.c_str(), &st) == 0) {
-        std::cout << "DEBUG: file \"" << fn << "\" " << when
-                  << ", size = " << st.st_size << " bytes\n";
-    } else {
-        std::cout << "DEBUG: stat failed on \"" << fn << "\"\n";
-    }
-}
 const string KZG_SUFFIX = "-P251";
 
 std::string addSuffixBeforeExtension(const std::string& filename, const std::string& suffix) {
@@ -33,148 +22,65 @@ void checkSignature(string filename) {
     }
     catch (signature_mismatch&)
     {
-//        ofstream pers(filename, ios::binary);
-ofstream pers(filename, ios::out | ios::binary | ios::trunc);
+        ofstream pers(filename, ios::binary);
         file_signature<T>().output(pers);
     }
 }
 
 //SOMETHING IS OFF WITH READ/WRITE SHARES
 
-//template<class T>
-//std::vector<T> read_inputs(Player& P, size_t size, int start, string suffix = "") {
-//    if (size == 0) {
-//        return std::vector<T>();
-//    }
-//    Binary_File_IO binary_file_io = Binary_File_IO();
-//
-//    string filename;
-//    filename = binary_file_io.filename(P.my_num());
-//    const string filename_suffix = addSuffixBeforeExtension(filename, suffix);
-//
-//    std::cout << "Reading shares with " << file_signature<T>() << " signature." << std::endl;
-//
-//    std::vector< T > outbuf(size);
-//
-//    int start_file_posn = start;
-//    int end_file_posn = start_file_posn;
-//
-//    try {
-//        binary_file_io.read_from_file(filename_suffix, outbuf, start_file_posn, end_file_posn);
-//    } catch (file_missing& e) {
-//        cerr << "Got file missing error, will return -2. " << e.what() << endl;
-//        throw file_error(filename_suffix);
-//    }
-//
-//    return outbuf;
-//}
 template<class T>
 std::vector<T> read_inputs(Player& P,
                            size_t size,
                            int start,
-                           string suffix = "") {
+                           const std::string& suffix = "") {
     if (size == 0) return {};
 
-    Binary_File_IO binary_file_io;
-    string filename = binary_file_io.filename(P.my_num());
-    const string filename_suffix = addSuffixBeforeExtension(filename, suffix);
+    Binary_File_IO io;
+    std::string fn = io.filename(P.my_num());
+    std::string fn2 = addSuffixBeforeExtension(fn, suffix);
 
-    std::cout << "Reading shares with " << file_signature<T>()
-              << " signature.\n";
+    std::cout << "[DBG] read_inputs: filename=" << fn2
+              << ", expected size=" << size
+              << ", start=" << start << std::endl;
 
-    std::vector<T> outbuf(size);
-    int start_file_posn = start, end_file_posn = start_file_posn;
+    std::vector<T> out(size);
+    int s = start, e = start;
+    io.read_from_file(fn2, out, s, e);
 
-    // 调试：打印将要从文件哪个位置读到哪个位置
-    std::cout << "DEBUG: read_inputs from \"" << filename_suffix
-              << "\": start_pos=" << start_file_posn
-              << ", end_pos (returned) will be updated in read_from_file\n";
+    std::cout << "[DBG] after read: actually read " << (e - start)
+              << " shares, out.size()=" << out.size() << std::endl;
 
-    try {
-        binary_file_io.read_from_file(filename_suffix,
-                                      outbuf,
-                                      start_file_posn,
-                                      end_file_posn);
-    } catch (file_missing& e) {
-        std::cerr << "Got file missing error, will return -2. " << e.what() << "\n";
-        throw file_error(filename_suffix);
-    }
-
-    // 调试：实际读到了多少（end_pos - start_pos）
-    std::cout << "DEBUG: read_inputs actually read "
-              << (end_file_posn - start_file_posn)
-              << " shares (outbuf.size()=" << outbuf.size() << ")\n";
-
-    return outbuf;
+    return out;
 }
 
 template<class T>
 void write_shares(Player& P,
-                  vector<T>& shares,
-                  string suffix = "",
+                  std::vector<T>& shares,
+                  const std::string& suffix = "",
                   bool overwrite = false,
                   int start_pos = 0) {
-    Binary_File_IO binary_file_io;
-
-    string filename = binary_file_io.filename(P.my_num());
-    const string filename_suffix = addSuffixBeforeExtension(filename, suffix);
-
-    assert(not (overwrite && start_pos > 0));
+    Binary_File_IO io;
+    std::string fn = io.filename(P.my_num());
+    std::string fn2 = addSuffixBeforeExtension(fn, suffix);
 
     if (overwrite) {
-        ofstream outf(filename_suffix,
-                      ios::out | ios::binary | ios::trunc);
-        outf.close();
-        std::cout << "truncating output file to start from the beginning\n";
+        std::ofstream out(fn2, std::ios::binary | std::ios::trunc).close();
+        std::cout << "[DBG] overwrite: truncated " << fn2 << std::endl;
     }
 
-    // —— 签名检测部分保持不变 ——
-    checkSignature<T>(filename_suffix);
+    checkSignature<T>(fn2);
 
-    // 调试：写入前
-    debug_print_file_size(filename_suffix, "before writing");
+    std::cout << "[DBG] before write: filename=" << fn2
+              << ", shares.size()=" << shares.size()
+              << ", start_pos=" << start_pos << std::endl;
 
-    // 调试：打印即将写入的信息
-    std::cout << "DEBUG: shares.size()=" << shares.size()
-              << ", start_pos=" << start_pos << "\n";
+    io.write_to_file(fn2, shares, -1);
 
-    std::cout << "Writing " << shares.size() << " shares "
-              << " with " << file_signature<T>()
-              << " signature. (appending to the end of the file)\n";
-
-//    // 真正写入
-//    binary_file_io.write_to_file(filename_suffix, shares, -1);
-auto written = binary_file_io.write_to_file(filename_suffix, shares, -1);
-std::cout << "DEBUG: write_to_file returned " << written << "\n";
-    // 调试：写入后
-    debug_print_file_size(filename_suffix, "after writing");
+    std::cout << "[DBG] after write: shares.size()=" << shares.size()
+              << ", appended to " << fn2 << std::endl;
 }
-//
-//template<class T>
-//void write_shares(Player& P, vector<T>& shares, string suffix = "", bool overwrite = false, int start_pos = 0) {
-//    Binary_File_IO binary_file_io = Binary_File_IO();
-//
-//    string filename;
-//    filename = binary_file_io.filename(P.my_num());
-//    const string filename_suffix = addSuffixBeforeExtension(filename, suffix);
-//
-//    assert(not (overwrite && start_pos > 0)); // cannot overwrite file and start at a non-zero position
-//
-//    if (overwrite) {
-//        ofstream outf;
-//        outf.open(filename_suffix, ios::out | ios::binary | ios::trunc);
-//        outf.close();
-//        std::cout << "truncating output file to start from the beginning" << std::endl;
-//    }
-//
-//    checkSignature<T>(filename_suffix);
-//    std::cout << "Writing " << shares.size() << " shares " << " with " << file_signature<T>() << " signature. (appending to the end of the file)" << std::endl;
-//
-//    // should append at the end!
-//    (void)start_pos;
-//    binary_file_io.write_to_file(filename_suffix, shares, -1);
-//
-//}
+
 
 void print_timer(const string name, double elapsed_s) {
     std::cout << fixed << "TIMER (name=" << name << "_mus) (value=" << (long long)(elapsed_s * 1e6) << ")" << std::endl;
