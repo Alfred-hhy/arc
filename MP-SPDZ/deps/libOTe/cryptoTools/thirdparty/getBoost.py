@@ -15,9 +15,7 @@ def getBoost(install, prefix, par):
     version = "83"
     folder = "boost_1_{0}_0".format(version)
     arch = "{0}.tar.bz2".format(folder)
-    url = "https://boostorg.jfrog.io/artifactory/main/release/1.{0}.0/source/{1}".format(version, arch)
-
-
+    url = "https://sourceforge.net/projects/boost/files/boost/1.83.0/{0}".format(arch)
     cwd = os.getcwd()
     
 
