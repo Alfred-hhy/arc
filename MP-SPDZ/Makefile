@@ -142,6 +142,7 @@ $(LIBRELEASE): Protocols/MalRepRingOptions.o $(PROCESSOR) $(COMMONOBJS) $(TINIER
 	$(AR) -csr $@ $^
 
 CFLAGS += -fPIC
+CFLAGS += -DVERBOSE  # 添加这一行以启用 VERBOSE 宏
 ifneq ($(OS), Darwin)
 CFLAGS += -fopenmp
 else
