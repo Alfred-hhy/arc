@@ -12,7 +12,7 @@ import platform
 import time
 
 def getBoost(install, prefix, par):
-    version = "81"
+    version = "83"
     folder = "boost_1_{0}_0".format(version)
     arch = "{0}.tar.bz2".format(folder)
     url = "https://sourceforge.net/projects/boost/files/boost/1.83.0/{0}".format(arch)
